@@ -91,6 +91,7 @@ public final class MongoClientSettings {
     private final String applicationName;
     private final List<MongoCompressor> compressorList;
     private final UuidRepresentation uuidRepresentation;
+    private final ServerApi serverApi;
 
     private final AutoEncryptionSettings autoEncryptionSettings;
 
@@ -160,6 +161,7 @@ public final class MongoClientSettings {
         private String applicationName;
         private List<MongoCompressor> compressorList = Collections.emptyList();
         private UuidRepresentation uuidRepresentation = UuidRepresentation.UNSPECIFIED;
+        private ServerApi serverApi;
 
         private AutoEncryptionSettings autoEncryptionSettings;
 
@@ -179,6 +181,7 @@ public final class MongoClientSettings {
             readConcern = settings.getReadConcern();
             credential = settings.getCredential();
             uuidRepresentation = settings.getUuidRepresentation();
+            serverApi = settings.getServerApi();
             streamFactoryFactory = settings.getStreamFactoryFactory();
             autoEncryptionSettings = settings.getAutoEncryptionSettings();
             clusterSettingsBuilder.applySettings(settings.getClusterSettings());
@@ -464,6 +467,21 @@ public final class MongoClientSettings {
         }
 
         /**
+         * Sets the server API to use when sending commands to the server.
+         * <p>
+         * This is required for some MongoDB deployments.
+         * </p>
+         *
+         * @param serverApi the server API, which may not be null
+         * @return this
+         * @since 4.3
+         */
+        public Builder serverApi(final ServerApi serverApi) {
+            this.serverApi = notNull("serverApi", serverApi);
+            return this;
+        }
+
+        /**
          * Sets the auto-encryption settings
          *
          * @param autoEncryptionSettings the auto-encryption settings
@@ -630,6 +648,17 @@ public final class MongoClientSettings {
     }
 
     /**
+     * Gets the server API to use when sending commands to the server.
+     *
+     * @return the server API, which may be null
+     * @since 4.3
+     */
+    @Nullable
+    public ServerApi getServerApi() {
+        return serverApi;
+    }
+
+    /**
      * Gets the auto-encryption settings.
      * <p>
      * Client side encryption enables an application to specify what fields in a collection must be
@@ -741,6 +770,7 @@ public final class MongoClientSettings {
         sslSettings = builder.sslSettingsBuilder.build();
         compressorList = builder.compressorList;
         uuidRepresentation = builder.uuidRepresentation;
+        serverApi = builder.serverApi;
         autoEncryptionSettings = builder.autoEncryptionSettings;
 
         SocketSettings.Builder heartbeatSocketSettingsBuilder = SocketSettings.builder()
